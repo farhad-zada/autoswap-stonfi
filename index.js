@@ -114,15 +114,7 @@ const getSlaveContract = async (client, mnemonics) => {
  * @returns {bigint}
  */
 const getRandomTransferAmountInTons = () => {
-    const randomOptions = [
-        1.5,
-        1.5,
-        1.5,
-        1.5,
-        1.6,
-        1.7,
-        1.8, //1.2, 1.2, 1.3, 1.4, 1.5, 1.5, 1.5, 1.5, 1.6, 1.7, 1.8, 2, 2, 2, 3, 4, 10,
-    ];
+    const randomOptions = process.env.AMOUNTS.split(",");
     return toNano(
         randomOptions[
             (Math.random() * 100).toFixed(0) % randomOptions.length
@@ -276,7 +268,7 @@ async function main() {
             let xoptToTonArgs = {
                 userWalletAddress: sellerSlave.address,
                 recevierAddress: sellerSlave.address,
-                offerAmount: toNano("60000"),
+                offerAmount: toNano("50000"),
                 offerJettonAddress: xoptAddress,
                 minAskAmount: toNano("0.0005"),
                 proxyTon: pTON.v2_1.create(
