@@ -1,0 +1,6 @@
+.env
+mnemonics.txt
+last_wallet_idx.txt
+last_sold_idx.txt
+node_modules
+addresses.txt
