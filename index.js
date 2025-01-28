@@ -175,8 +175,10 @@ const transferToSlave = async (transferAmount, master, slave, masterSecret) => {
     }
 };
 
-const getRandomWaitTime = () =>
-    (Math.random() * (540000 - 150000 + 1) + 100000).toFixed(0) * 1;
+const getRandomWaitTime = () => {
+    let ms = 1000;
+    return (Math.random() * (540 * ms - 120 * ms + 1) + 60 * ms).toFixed(0) * 1;
+};
 
 async function buyXopt() {}
 
@@ -272,10 +274,10 @@ async function main() {
                 offerJettonAddress: xoptAddress,
                 minAskAmount: toNano("0.0005"),
                 proxyTon: pTON.v2_1.create(
-                    "EQBnGWMCf3-FZZq1W4IWcWiGAc3PHuZ0_H-7sad2oY00o83S" 
+                    "EQBnGWMCf3-FZZq1W4IWcWiGAc3PHuZ0_H-7sad2oY00o83S"
                 ),
                 queryId: 1234n,
-                bounce: false
+                bounce: false,
             };
 
             let xoptToTonParams = await dex.getSwapJettonToTonTxParams(
