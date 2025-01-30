@@ -138,7 +138,7 @@ const transferToSlave = async (transferAmount, sender, receiver, senderSecret) =
     console.log("Waiting for 60 seconds!");
     await delay(60000);
     console.log("Waited for 60 seconds!");
-    let balance = await slave.getBalance();
+    let balance = await sender.getBalance();
     if (transferAmount <= balance + toNano("0.2")) {
         console.log("Transferred successfully!");
     } else if (Date.now() - start > 50000) {
