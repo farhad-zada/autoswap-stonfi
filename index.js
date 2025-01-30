@@ -119,8 +119,15 @@ const getRandomTransferAmountInTons = () => {
  * @param {import("@ton/ton").OpenedContract<WalletContractV4>} slave
  * @param {Buffer<ArrayBufferLike>} masterSecret
  */
-const transferToSlave = async (transferAmount, sender, receiver, senderSecret) => {
-    console.log("Transferring " + fromNano(transferAmount) + " tons to receiver!");
+const transferToSlave = async (
+    transferAmount,
+    sender,
+    receiver,
+    senderSecret
+) => {
+    console.log(
+        "Transferring " + fromNano(transferAmount) + " tons to receiver!"
+    );
     await sender.sendTransfer({
         secretKey: senderSecret,
         seqno: await sender.getSeqno(),
@@ -132,7 +139,9 @@ const transferToSlave = async (transferAmount, sender, receiver, senderSecret) =
             }),
         ],
     });
-    console.log("Transferred " + fromNano(transferAmount) + " tons to receiver!");
+    console.log(
+        "Transferred " + fromNano(transferAmount) + " tons to receiver!"
+    );
 
     let start = Date.now();
     console.log("Waiting for 60 seconds!");
@@ -169,20 +178,31 @@ async function buyXopt(idx) {
     console.log("Set last wallet idx to: ", idx);
     console.log("Getting random transfer amount in tons!");
     const transferAmount = getRandomTransferAmountInTons();
-    console.log("Got random transfer amount in tons: ", fromNano(transferAmount));
+    console.log(
+        "Got random transfer amount in tons: ",
+        fromNano(transferAmount)
+    );
     console.log("Getting slave balance!");
     const slaveBalance = await slave.getBalance();
     console.log("Slave balance: ", fromNano(slaveBalance));
     if (slaveBalance < transferAmount - toNano("0.2")) {
         console.log("Slave balance is less than transfer amount!");
-        console.log("Filling slave wallet with " + fromNano(transferAmount - slaveBalance + toNano("0.2")) + " tons!");
+        console.log(
+            "Filling slave wallet with " +
+                fromNano(transferAmount - slaveBalance + toNano("0.2")) +
+                " tons!"
+        );
         await transferToSlave(
-            (transferAmount - slaveBalance + toNano("0.2")),
+            transferAmount - slaveBalance + toNano("0.2"),
             master,
             slave,
             masterKeyPair.secretKey
         );
-        console.log("Filled slave wallet with " + fromNano(transferAmount - slaveBalance + toNano("0.2")) + " tons!");
+        console.log(
+            "Filled slave wallet with " +
+                fromNano(transferAmount - slaveBalance + toNano("0.2")) +
+                " tons!"
+        );
     }
 
     console.log("Slave wallet is ready to buy XOPT!");
@@ -209,14 +229,20 @@ async function buyXopt(idx) {
         messages: [internal(tonToXoptParams)],
     });
     console.log("Sent transfer!");
-    console.log(`Waiting for ${(randomWaitMilliseconds/1000).toFixed()} seconds!`);
+    console.log(
+        `Waiting for ${(randomWaitMilliseconds / 1000).toFixed()} seconds!`
+    );
     await delay(randomWaitMilliseconds);
-    console.log("Waited for ", (randomWaitMilliseconds/1000).toFixed(), " seconds!");
+    console.log(
+        "Waited for ",
+        (randomWaitMilliseconds / 1000).toFixed(),
+        " seconds!"
+    );
 }
 
 /**
- * 
- * @param {number} idx 
+ *
+ * @param {number} idx
  * @returns {Promise<void>}
  */
 async function sellXopt(idx) {
@@ -297,9 +323,15 @@ async function sellXopt(idx) {
         sellerSlaveKeyPair.secretKey
     );
     let randomWaitMilliseconds = getRandomWaitTime();
-    console.log(`Waiting for ${(randomWaitMilliseconds/1000).toFixed()} seconds!`);
+    console.log(
+        `Waiting for ${(randomWaitMilliseconds / 1000).toFixed()} seconds!`
+    );
     await delay(randomWaitMilliseconds);
-    console.log("Waited for ", (randomWaitMilliseconds/1000).toFixed(), " seconds!");
+    console.log(
+        "Waited for ",
+        (randomWaitMilliseconds / 1000).toFixed(),
+        " seconds!"
+    );
 }
 
 async function main() {
@@ -316,8 +348,8 @@ async function main() {
     console.log("Opened DEX!");
     console.log("Opening pTON!");
     proxyTon = pTON.v2_1.create(
-        "EQBnGWMCf3-FZZq1W4IWcWiGAc3PHuZ0_H-7sad2oY00o83S" 
-    )
+        "EQBnGWMCf3-FZZq1W4IWcWiGAc3PHuZ0_H-7sad2oY00o83S"
+    );
     console.log("Opened pTON!");
     console.log("Getting master contract!");
     const masterRes = await getMasterContract(client);
@@ -327,15 +359,18 @@ async function main() {
     console.log("Master address: ", master.address.toString());
     console.log("Master balance: ", fromNano(await master.getBalance()));
 
-
     for (let idx = lastWalletIdx; idx < mnemonics.length; idx++) {
-        const masterBalance = await master.getBalance();
-        if (masterBalance < toNano("2")) {
-            console.log("Not enough balance in the master wallet!");
-            process.exit();
+        try {
+            const masterBalance = await master.getBalance();
+            if (masterBalance < toNano("2")) {
+                console.log("Not enough balance in the master wallet!");
+                process.exit();
+            }
+            await buyXopt(idx);
+            await sellXopt(idx);
+        } catch (e) {
+            console.log(e);
         }
-        await buyXopt(idx);
-        await sellXopt(idx);
     }
 }
 
