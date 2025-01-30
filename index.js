@@ -364,7 +364,6 @@ async function main() {
             const masterBalance = await master.getBalance();
             if (masterBalance < toNano("2")) {
                 console.log("Not enough balance in the master wallet!");
-                process.exit();
             }
             await buyXopt(idx);
             await sellXopt(idx);
