@@ -5,6 +5,7 @@ const {
     internal,
     toNano,
     Address,
+    fromNano,
 } = require("@ton/ton");
 const { mnemonicToPrivateKey } = require("@ton/crypto");
 const { getHttpEndpoint } = require("@orbs-network/ton-access");
@@ -14,17 +15,17 @@ const { DEX, pTON } = require("@ston-fi/sdk");
 
 config();
 
-let cms = 0n;
+let client;
+let dex;
+let pton;
+let masterKeyPair;
+let master;
+
 function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
-/**
- * @returns {string}
- */
-const getMnemonicsAt = (idx) => {
-    const allMnemonics = readFileSync("./mnemonics.txt", "utf8");
-    return allMnemonics.split("\n")[idx];
-};
+
+let mnemonics = readFileSync("./mnemonics.txt", "utf8").split("\n");
 
 /**
  *
@@ -93,13 +94,23 @@ const transferTon = async (transferAmount, sender, recipient, senderSecret) => {
  * @param {string} recipient
  */
 async function main(fromIdx, to) {
-    const client = await getClient();
-    let mnemonics = getMnemonicsAt(fromIdx);
-    let { contract, keyPair } = await getContract(client, mnemonics);
-    console.log(`SENDER: ${contract.address.toString()}`);
-    let balance = await contract.getBalance();
-    let transferAmount = balance - toNano("0.2");
-    await transferTon(transferAmount, contract, to, keyPair.secretKey);
+    client = await getClient();
+    for (let i = 0; i < mnemonics.length; i++) {
+        let { contract, keyPair } = await getContract(client, mnemonics[i]);
+        console.log(`SENDER: ${contract.address.toString()}`);
+        let balance = await contract.getBalance();
+        console.log(`Balance: ${fromNano(balance)}`);
+        if (balance > toNano("0.01")) {
+            let transferAmount = balance - toNano("0.01");
+            console.log(`Transfer amount: ${fromNano(transferAmount)}`);
+            let to = Address.parse("UQCGAdFrKHV0a_FahdCqILB-tiVJ3EqXC1TWnnLCKq_aTFvi");
+            console.log("Recipient: ", to.toString());
+            console.log("Transfering...");
+            await transferTon(transferAmount, contract, to.toString(), keyPair.secretKey);
+            await delay(1100);
+            console.log("Transfered!");
+        }
+    }
 }
 
 main(process.env.FROM, process.env.RECIPIENT)
