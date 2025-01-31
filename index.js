@@ -389,8 +389,12 @@ async function main() {
                     getTimeBaku() + "Not enough balance in the master wallet!"
                 );
             }
-            await buyXopt(idx);
-            await sellXopt(idx);
+            if (process.env.BUY) {
+                await buyXopt(idx);
+            }
+            if (process.env.SELL) {
+                await sellXopt(idx);
+            }
         } catch (e) {
             console.log(getTimeBaku() + e);
         }

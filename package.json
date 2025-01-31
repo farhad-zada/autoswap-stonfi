@@ -3,7 +3,9 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "start": "ENV=prod node index.js"
+        "start": "ENV=prod BUY=true SELL=true node index.js",
+        "start-sell": "ENV=prod SELL=true node index.js",
+        "start-buy": "ENV=prod BUY=true node index.js"
     },
     "keywords": [],
     "author": "farhad.szd@gmail.com",
