@@ -390,9 +390,11 @@ async function main() {
                 );
             }
             if (process.env.BUY) {
+                console.log(getTimeBaku() + "BUY is set to " + process.env.BUY);
                 await buyXopt(idx);
             }
             if (process.env.SELL) {
+                console.log(getTimeBaku() + "SELL is set to " + process.env.SELL);
                 await sellXopt(idx);
             }
         } catch (e) {
