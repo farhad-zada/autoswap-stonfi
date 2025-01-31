@@ -279,8 +279,8 @@ async function sellXopt(idx) {
     let walletContract = client.open(JettonWallet.create(walletAddress));
     let balance = await walletContract.getBalance();
     console.log(getTimeBaku() + "Seller Wallet Balance: ", fromNano(balance));
-    if (balance < toNano("70000")) {
-        console.log(getTimeBaku() + "Seller Wallet balance is less than 70000");
+    if (balance < toNano(process.env.MIN_SELL || "30000")) {
+        console.log(getTimeBaku() + "Seller Wallet balance is less than 100000");
         return false;
     }
     let sellerTonBalance = await sellerSlave.getBalance();
@@ -288,16 +288,16 @@ async function sellXopt(idx) {
         getTimeBaku() + "Seller TON Balance: ",
         fromNano(sellerTonBalance)
     );
-    if (sellerTonBalance < toNano("0.5")) {
-        console.log(getTimeBaku() + "Seller TON balance is less than 0.5");
-        console.log(getTimeBaku() + "Filling seller Wallet with 0.05 tons!");
+    if (sellerTonBalance < toNano("0.05")) {
+        console.log(getTimeBaku() + "Seller TON balance is less than 0.055");
+        console.log(getTimeBaku() + "Filling seller Wallet with 0.055 tons!");
         await transferToSlave(
-            toNano("0.5"),
+            toNano("0.055"),
             master,
             sellerSlave,
             masterKeyPair.secretKey
         );
-        console.log(getTimeBaku() + "Filled seller Wallet with 0.05 tons!");
+        console.log(getTimeBaku() + "Filled seller Wallet with 0.055 tons!");
     }
 
     console.log(getTimeBaku() + "Seller Wallet is ready to sell XOPT!");
@@ -307,7 +307,7 @@ async function sellXopt(idx) {
         recevierAddress: sellerSlave.address,
         offerAmount: balance - toNano("100"),
         offerJettonAddress: xoptAddress,
-        minAskAmount: toNano("0.0005"),
+        minAskAmount: toNano("0.000001"),
         proxyTon: pTON.v2_1.create(
             "EQBnGWMCf3-FZZq1W4IWcWiGAc3PHuZ0_H-7sad2oY00o83S"
         ),
@@ -333,9 +333,13 @@ async function sellXopt(idx) {
         getTimeBaku() + "Seller TON Balance After: ",
         fromNano(sellerTonBalanceAfter)
     );
+    if (sellerTonBalanceAfter < toNano("0.5")) {
+        console.log(getTimeBaku() + "Not enough balance to send to master!");
+        return;
+    }
     console.log(getTimeBaku() + "Transferring balance to master!");
     await transferToSlave(
-        sellerTonBalanceAfter - toNano("0.01"),
+        sellerTonBalanceAfter - toNano("0.03"),
         sellerSlave,
         master,
         sellerSlaveKeyPair.secretKey
